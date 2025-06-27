@@ -1,0 +1,19 @@
+{
+  "name": "document-scanner-project",
+  "version": "1.0.0",
+  "description": "Kompletní řešení pro skenování dokumentů s OCR technologií",
+  "scripts": {
+    "install-all": "cd mobile-app && npm install && cd ../server && npm install",
+    "start-server": "cd server && npm start",
+    "dev-server": "cd server && npm run dev",
+    "start-mobile": "cd mobile-app && npm start",
+    "build-mobile": "cd mobile-app && expo build:android",
+    "setup": "npm run install-all"
+  },
+  "keywords": ["document", "scanner", "ocr", "react-native", "expo", "tesseract"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

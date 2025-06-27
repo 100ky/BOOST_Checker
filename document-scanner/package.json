@@ -1,0 +1,16 @@
+{
+  "name": "document-scanner-project",
+  "version": "1.0.0",
+  "description": "Complete document scanner solution with mobile app and web interface",
+  "scripts": {
+    "install-all": "npm run install-mobile && npm run install-server",
+    "install-mobile": "cd mobile-app && npm install",
+    "install-server": "cd server && npm install",
+    "start-server": "cd server && npm start",
+    "dev-server": "cd server && npm run dev",
+    "start-mobile": "cd mobile-app && npm start"
+  },
+  "keywords": ["document", "scanner", "ocr", "expo", "react-native"],
+  "author": "",
+  "license": "MIT"
+}
