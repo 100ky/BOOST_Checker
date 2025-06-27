@@ -6,6 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const http = require('http');
 const socketIo = require('socket.io');
 const Tesseract = require('tesseract.js');
+const PruvodkaParser = require('./PruvodkaParser');
 
 const app = express();
 const server = http.createServer(app);
@@ -109,10 +110,18 @@ app.post('/api/documents', async (req, res) => {
     
     // Spustíme OCR zpracování na serveru
     let extractedText = text || '';
+    let parsedData = null;
     try {
       console.log('Zpracovávám OCR pro dokument:', id);
       const ocrResult = await processOCR(filepath);
       extractedText = ocrResult.text;
+      
+      // Použijeme specializovaný parser pro průvodky
+      if (extractedText) {
+        parsedData = PruvodkaParser.parsePruvodka(extractedText);
+        console.log('Parser výsledek:', parsedData);
+      }
+      
       console.log('OCR dokončeno pro dokument:', id);
     } catch (ocrError) {
       console.error('Chyba OCR:', ocrError);
@@ -124,24 +133,30 @@ app.post('/api/documents', async (req, res) => {
       text: extractedText,
       timestamp: timestamp || new Date().toISOString(),
       filename,
-      filepath
+      filepath,
+      parsed: parsedData,
+      type: parsedData && parsedData.parsed ? 'pruvodka' : 'document'
     };
     
     documents.push(document);
     
-    // Pošleme notifikaci všem připojeným klientům
+    // Pošleme notifikaci všem připojeným klientům s parsovanými daty
     io.emit('newDocument', {
       id: document.id,
       text: document.text,
       timestamp: document.timestamp,
-      filename: document.filename
+      filename: document.filename,
+      parsed: document.parsed,
+      type: document.type
     });
     
-    console.log(`Nový dokument přijat: ${id}`);
+    console.log(`Nový dokument přijat: ${id}, typ: ${document.type}`);
     res.status(201).json({ 
       message: 'Dokument úspěšně nahrán', 
       id: document.id,
-      text: extractedText 
+      text: extractedText,
+      parsed: parsedData,
+      type: document.type
     });
     
   } catch (error) {

@@ -68,13 +68,50 @@ export default function DocumentList() {
   const renderDocument = ({ item }) => (
     <Card style={styles.card}>
       <Card.Content>
-        <Title>Dokument {item.id}</Title>
+        <Title>
+          {item.type === 'pruvodka' ? '📋 Průvodka' : '📄 Dokument'} {item.id}
+        </Title>
         <Paragraph style={styles.timestamp}>
           {new Date(item.timestamp).toLocaleString('cs-CZ')}
         </Paragraph>
-        <Paragraph numberOfLines={3} style={styles.text}>
-          {item.text || 'Žádný text nebyl rozpoznán'}
-        </Paragraph>
+        
+        {/* Zobrazení extrahovaných údajů z průvodky */}
+        {item.parsed && item.parsed.parsed && (
+          <View style={styles.parsedDataContainer}>
+            <Text style={styles.parsedDataTitle}>📊 Extrahovaná data:</Text>
+            
+            {item.parsed.cisloVykresu && (
+              <View style={styles.dataRow}>
+                <Text style={styles.dataLabel}>🔢 Číslo výkresu:</Text>
+                <Text style={styles.dataValue}>{item.parsed.cisloVykresu}</Text>
+              </View>
+            )}
+            
+            {item.parsed.mnozstviVyrobku && (
+              <View style={styles.dataRow}>
+                <Text style={styles.dataLabel}>📦 Množství výrobku:</Text>
+                <Text style={styles.dataValue}>{item.parsed.mnozstviVyrobku}</Text>
+              </View>
+            )}
+            
+            {item.parsed.confidence && (
+              <View style={styles.dataRow}>
+                <Text style={styles.dataLabel}>🎯 Spolehlivost:</Text>
+                <Text style={[styles.dataValue, { color: item.parsed.confidence > 0.7 ? '#4CAF50' : '#FF9800' }]}>
+                  {Math.round(item.parsed.confidence * 100)}%
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
+        
+        {/* Rozpoznaný text */}
+        <View style={styles.textContainer}>
+          <Text style={styles.textLabel}>📝 Rozpoznaný text:</Text>
+          <Paragraph numberOfLines={3} style={styles.text}>
+            {item.text || 'Žádný text nebyl rozpoznán'}
+          </Paragraph>
+        </View>
       </Card.Content>
       <Card.Actions>
         <Button 
@@ -149,11 +186,53 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 8,
   },
-  text: {
+  parsedDataContainer: {
+    backgroundColor: '#e8f5e8',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4CAF50',
+  },
+  parsedDataTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#2E7D32',
+    marginBottom: 8,
+  },
+  dataRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+    flexWrap: 'wrap',
+  },
+  dataLabel: {
+    fontSize: 13,
+    color: '#2E7D32',
+    fontWeight: '500',
+    flex: 1,
+  },
+  dataValue: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#1B5E20',
+    flex: 1,
+    textAlign: 'right',
+  },
+  textContainer: {
     marginTop: 8,
+  },
+  textLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 4,
+  },
+  text: {
     backgroundColor: '#f9f9f9',
     padding: 8,
     borderRadius: 4,
+    fontSize: 12,
+    lineHeight: 16,
   },
   button: {
     marginLeft: 8,

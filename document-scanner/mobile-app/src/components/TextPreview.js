@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Card, Title, Paragraph, Chip } from 'react-native-paper';
 
-export default function TextPreview({ text, confidence }) {
+export default function TextPreview({ text, confidence, parsed, type }) {
   if (!text || text.trim() === '') {
     return (
       <Card style={styles.card}>
@@ -27,7 +27,9 @@ export default function TextPreview({ text, confidence }) {
     <Card style={styles.card}>
       <Card.Content>
         <View style={styles.header}>
-          <Title style={styles.title}>Rozpoznaný text</Title>
+          <Title style={styles.title}>
+            {type === 'pruvodka' ? 'Průvodka' : 'Rozpoznaný text'}
+          </Title>
           {confidence && (
             <Chip 
               style={[
@@ -39,6 +41,37 @@ export default function TextPreview({ text, confidence }) {
             </Chip>
           )}
         </View>
+
+        {/* Zobrazení parsovaných dat z průvodky */}
+        {parsed && parsed.parsed && (
+          <Card style={styles.parsedDataCard}>
+            <Card.Content>
+              <Title style={styles.parsedTitle}>Extrahovaná data</Title>
+              {parsed.cisloVykresu && (
+                <View style={styles.dataRow}>
+                  <Text style={styles.dataLabel}>Číslo výkresu:</Text>
+                  <Text style={styles.dataValue}>{parsed.cisloVykresu}</Text>
+                </View>
+              )}
+              {parsed.mnozstviVyrobku && (
+                <View style={styles.dataRow}>
+                  <Text style={styles.dataLabel}>Množství výrobku:</Text>
+                  <Text style={styles.dataValue}>{parsed.mnozstviVyrobku}</Text>
+                </View>
+              )}
+              {parsed.polozky && parsed.polozky.length > 0 && (
+                <View style={styles.itemsContainer}>
+                  <Text style={styles.dataLabel}>Položky:</Text>
+                  {parsed.polozky.map((polozka, index) => (
+                    <View key={index} style={styles.itemRow}>
+                      <Text style={styles.itemText}>• {polozka}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </Card.Content>
+          </Card>
+        )}
         
         <ScrollView style={styles.textContainer} showsVerticalScrollIndicator={false}>
           <Text style={styles.recognizedText} selectable>
@@ -169,5 +202,44 @@ const styles = StyleSheet.create({
   formatChip: {
     marginRight: 8,
     marginBottom: 4,
+  },
+  parsedDataCard: {
+    marginBottom: 10,
+    backgroundColor: '#e8f5e8',
+    elevation: 2,
+  },
+  parsedTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2e7d32',
+    marginBottom: 8,
+  },
+  dataRow: {
+    flexDirection: 'row',
+    marginBottom: 6,
+    alignItems: 'center',
+  },
+  dataLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#555',
+    minWidth: 120,
+  },
+  dataValue: {
+    fontSize: 14,
+    color: '#1976d2',
+    fontWeight: '500',
+    flex: 1,
+  },
+  itemsContainer: {
+    marginTop: 8,
+  },
+  itemRow: {
+    marginLeft: 10,
+    marginTop: 4,
+  },
+  itemText: {
+    fontSize: 13,
+    color: '#666',
   },
 });

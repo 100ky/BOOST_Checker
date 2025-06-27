@@ -21,6 +21,8 @@ export default function CameraScreen() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [lastImage, setLastImage] = useState(null);
   const [extractedText, setExtractedText] = useState('');
+  const [parsedData, setParsedData] = useState(null);
+  const [documentType, setDocumentType] = useState('document');
   const cameraRef = useRef();
 
   const takePicture = async () => {
@@ -53,11 +55,19 @@ export default function CameraScreen() {
         setExtractedText(text);
         
         // Pošleme data na server
-        await ApiService.uploadDocument({
+        const response = await ApiService.uploadDocument({
           image: manipulatedImage.base64,
           text: text,
           timestamp: new Date().toISOString()
         });
+        
+        // Uložíme parsovaná data z odpovědi serveru
+        if (response.parsed) {
+          setParsedData(response.parsed);
+        }
+        if (response.type) {
+          setDocumentType(response.type);
+        }
         
         Alert.alert('Úspěch', 'Dokument byl úspěšně naskenován a odeslán!');
         
@@ -116,7 +126,11 @@ export default function CameraScreen() {
                 <Image source={{ uri: lastImage }} style={styles.previewImage} />
               </Card.Content>
             </Card>
-            <TextPreview text={extractedText} />
+            <TextPreview 
+              text={extractedText} 
+              parsed={parsedData}
+              type={documentType}
+            />
           </View>
         )}
       </View>

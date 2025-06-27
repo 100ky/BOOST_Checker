@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Změňte tuto URL na adresu vašeho serveru
-const BASE_URL = 'http://10.0.0.178:3000'; // IP adresa serveru
+const BASE_URL = 'https://bookish-zebra-r4vwvx44rprcppgw-3000.app.github.dev'; // GitHub Codespaces URL
 
 class ApiService {
   static async uploadDocument(documentData) {

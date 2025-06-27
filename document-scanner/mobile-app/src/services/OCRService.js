@@ -1,6 +1,6 @@
-// Pro jednoduchost budeme OCR zpracovávat na serveru
-// V budoucnu můžeme integrovat cloudové API jako Google Vision nebo Azure
+import PruvodkaParser from './PruvodkaParser';
 
+// OCR service pro zpracování dokumentů s specializací na průvodky
 class OCRService {
   static async extractText(imageUri) {
     try {
@@ -16,6 +16,51 @@ class OCRService {
     } catch (error) {
       console.error('OCR Error:', error);
       return '';
+    }
+  }
+
+  /**
+   * Zpracuje text pomocí specializovaného parseru pro průvodky
+   * @param {string} rawText - Raw text z OCR
+   * @returns {Object} Zpracované informace
+   */
+  static async processPruvodka(rawText) {
+    try {
+      console.log('Processing průvodka:', rawText);
+      
+      // 1. Validace, zda se jedná o průvodku
+      const validation = PruvodkaParser.validatePruvodka(rawText);
+      
+      if (!validation.isPruvodka) {
+        return {
+          type: 'unknown',
+          confidence: validation.confidence,
+          message: 'Dokument nerozpoznán jako průvodka'
+        };
+      }
+
+      // 2. Parsování průvodky
+      const parsedData = PruvodkaParser.parsePruvodka(rawText);
+      
+      // 3. Formátování výstupu
+      const formattedOutput = PruvodkaParser.formatOutput(parsedData);
+      
+      return {
+        type: 'pruvodka',
+        confidence: validation.confidence,
+        parsed: parsedData.parsed,
+        data: parsedData,
+        formatted: formattedOutput,
+        rawText: rawText
+      };
+      
+    } catch (error) {
+      console.error('Error processing průvodka:', error);
+      return {
+        type: 'error',
+        error: error.message,
+        rawText: rawText
+      };
     }
   }
 

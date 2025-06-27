@@ -11,6 +11,111 @@ Mobilní aplikace pro skenování dokumentů s OCR technologií (rozpoznávání
 - 📊 **Statistiky** a přehled naskenovaných dokumentů
 - 🗂️ **Správa dokumentů** - mazání, prohlížení detailů
 
+## 🏠 Spuštění doma ve VS Code
+
+### Příprava (jednorázově):
+
+1. **Klonování z GitHubu:**
+```bash
+git clone <URL_VAŠEHO_REPOZITÁŘE>
+cd document-scanner
+```
+
+2. **Instalace závislostí:**
+```bash
+# Spusťte instalační skript
+chmod +x install-project.sh
+./install-project.sh
+```
+
+### Každodenní spuštění:
+
+1. **Zjištění IP adresy vašeho PC:**
+```bash
+# Windows (Command Prompt)
+ipconfig
+
+# macOS/Linux
+hostname -I
+# nebo
+ifconfig | grep inet
+```
+
+2. **Aktualizace IP adresy v mobilní aplikaci:**
+```bash
+# Automatické nastavení IP (Linux/macOS)
+./update-ip.sh
+
+# Nebo ručně upravte soubor:
+# mobile-app/src/services/ApiService.js
+# Změňte řádek: const BASE_URL = 'http://VAŠE_IP_ADRESA:3000';
+```
+
+3. **Spuštění serveru:**
+```bash
+# V hlavní složce document-scanner
+./start.sh
+# nebo ručně:
+cd server && npm start
+```
+
+4. **Spuštění mobilní aplikace:**
+```bash
+# V novém terminálu
+cd mobile-app
+npx expo start
+
+# Pro tunel (pokud máte problémy s lokální sítí):
+npx expo start --tunnel
+```
+
+5. **Připojení telefonu:**
+   - Nainstalujte **Expo Go** na telefon
+   - Naskenujte QR kód z terminálu
+   - Aplikace se automaticky načte
+
+### 🧪 Testování s průvodkou:
+
+Po spuštění můžete testovat:
+
+1. **Vyfotografujte průvodku** v mobilní aplikaci
+2. **Zkontrolujte extrakci dat:**
+   - Číslo výkresu
+   - Množství výrobku/položky  
+   - Typ dokumentu (Průvodka vs Dokument)
+3. **Webové rozhraní:** `http://localhost:3000`
+4. **Seznam dokumentů** v mobilní aplikaci
+
+### 🔧 Časté problémy doma:
+
+**Server se nemůže spustit:**
+- Zkontrolujte, že port 3000 není používán jinou aplikací
+- Spusťte: `lsof -ti:3000 | xargs kill -9` (macOS/Linux)
+
+**Mobilní app se nemůže připojit:**
+- Ujistěte se, že PC i telefon jsou ve stejné WiFi síti
+- Zkontrolujte firewall (Windows může blokovat port 3000)
+- Zkuste `npx expo start --tunnel` pro obejití síťových problémů
+
+**OCR nefunguje správně:**
+- Server potřebuje chvíli na first-time download Tesseract modelů
+- Sledujte logy v terminálu při prvním OCR
+
+### 📊 Parsování průvodek:
+
+Aplikace nyní umí rozpoznat z průvodek:
+- **Číslo výkresu** (formát: číslo, /číslo, nebo R číslo)
+- **Množství výrobku** (čísla následovaná "ks" nebo "CELKOVÉ MNOŽSTVÍ")
+- **Položky** (řádky s čísly a textem)
+- **Typ dokumentu** (automaticky detekuje průvodky)
+
+### 🔗 GitHub repozitář:
+
+Vše je uloženo na GitHubu, takže můžete:
+- Stáhnout nejnovější verzi: `git pull`
+- Vytvořit vlastní větev: `git checkout -b moje-upravy`
+- Zálohovat změny: `git add . && git commit -m "Moje změny"`
+
 ## 🚀 Rychlá instalace
 
 ### 1. Spusťte instalační skript
